@@ -1,0 +1,23 @@
+class AllTest
+
+operations
+
+
+-- Main para correr todos os testes
+public static main: () ==> ()
+	main() ==
+(
+
+dcl FacebookTest: FacebookTest := new FacebookTest();
+dcl UserTest: UserTest := new UserTest();
+dcl PostTest: PostTest := new PostTest();
+dcl FeedTest: FeedTest := new FeedTest();
+
+FacebookTest.main();
+UserTest.main();
+PostTest.main();
+FeedTest.main();
+
+);
+
+end AllTest

@@ -1,0 +1,65 @@
+class Post
+instance variables
+  description: Utils`String;
+  date:Date; 
+  ifPrivate:nat;
+
+operations
+
+--Construtor do Post
+  public  Post : seq of (char) * Date * nat ==> Post
+  Post(newDescription, newDate, newPrivatePosts) ==(
+  	description := newDescription;
+  	date := newDate;
+  	ifPrivate := newPrivatePosts;  -- 0 se public, 1 para friends, 2 para best friends
+  	return self;
+  );
+
+/*Métodos Get*/
+
+  public  getDescription : ()  ==> Utils`String
+  getDescription() == (
+   return description;
+  );
+  
+  public  getDate : ()  ==> Date
+  getDate() == (
+   return date;
+  );
+  
+  public getIfPrivate : () ==> nat
+  getIfPrivate() == (
+  	return ifPrivate;
+  );
+  
+ /*Métodos Set*/
+ 
+public setDescription : Utils`String ==> ()
+setDescription(newDescription) == (
+	description := newDescription;
+);
+
+public setDate : Date ==> ()
+setDate(newDate) == (
+	date := newDate;
+);
+
+public setIfPrivate : nat ==> ()
+setIfPrivate(newIfPrivate) == (
+	ifPrivate := newIfPrivate;
+);
+
+
+/*Funções*/
+
+-- Função útil para o feed de notícias (que posts mostrar em primeiro lugar)
+-- Se o primeiro é mais velho, retorna true, caso contrário retorna falso
+public comparePostsByDate : Post * Post ==> bool
+comparePostsByDate(post1, post2) == (
+	if post1.getDate().isOlder(post2.getDate())
+	then return true
+	else return false;
+); 
+
+
+end Post

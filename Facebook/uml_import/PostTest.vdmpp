@@ -1,0 +1,67 @@
+class PostTest
+types
+public String = seq of char;
+values
+-- TODO Define values here
+instance variables
+-- public user:User := new User("testUser", "testEmail@hotmail.com", "testPassword", {}, {});
+operations
+
+-- Assert Generic Operation
+ assertTrue: bool ==> ()
+                assertTrue(cond) == return
+                pre cond;
+                
+ -- Test Post constructor
+ public postConstructorTest: () ==> ()
+ postConstructorTest() == (
+ 
+ 	dcl date1 : Date := new Date(2019, 02, 12, 20, 32, 00);
+ 	dcl post1: Post:= new Post("O meu primeiro Post", date1, 1);
+ 	assertTrue(post1.getDescription() = "O meu primeiro Post");
+ 	assertTrue(post1.getIfPrivate() = 1);
+ 	assertTrue(post1.getDate() = date1);
+
+ );
+ 
+  public postSetParametersTest: () ==> ()
+ postSetParametersTest() == (
+ 
+ 	dcl date1: Date := new Date(2019, 02, 12, 20, 32, 00);
+ 	dcl date2: Date := new Date(2019,02,13,21,21,21);
+ 	dcl post1: Post:= new Post("O meu primeiro Post", date1, 1);
+ 	
+ 	post1.setDescription("Alterei o post");
+ 	post1.setDate(date2);
+ 	post1.setIfPrivate(0);
+ 	
+ 	assertTrue(post1.getDescription() = "Alterei o post");
+ 	assertTrue(post1.getIfPrivate() = 0);
+ 	assertTrue(post1.getDate() = date2);
+ );
+ 
+ public postCompareDatesTest: () ==> ()
+ postCompareDatesTest() == (
+
+ 	dcl date1 : Date := new Date(2019, 02, 12, 20, 32, 00);
+ 	dcl date2 : Date := new Date(2019, 03, 12, 20, 32, 00);
+ 	dcl post1: Post:= new Post("O meu primeiro Post", date1, 1);
+	dcl post2: Post:= new Post("O segundo Post", date2, 1);
+ 	
+ 	assertTrue(post1.comparePostsByDate(post1, post2) = true);
+ 	assertTrue(post1.comparePostsByDate(post2, post1) = false);
+ );
+ 
+ 
+ 
+ public static main: () ==> ()
+	main() ==
+(
+dcl PostTest: PostTest :=new PostTest();
+	PostTest.postConstructorTest();
+	PostTest.postSetParametersTest();
+	PostTest.postCompareDatesTest();
+	return      
+);
+
+end PostTest

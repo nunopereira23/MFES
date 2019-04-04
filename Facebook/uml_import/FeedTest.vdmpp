@@ -1,0 +1,109 @@
+class FeedTest
+types
+public String = seq of char;
+values
+instance variables
+ public user:User := new User("testUser", "testEmail@hotmail.com", "testPassword", {}, {});
+ public facebook:Facebook := new Facebook();
+operations
+
+-- Assert Generic Operation
+ assertTrue: bool ==> ()
+                assertTrue(cond) == return
+                pre cond;
+                
+	-- Simulates assertion checking by reducing it to post-condition checking.
+	-- If values are not equal, prints a message in the console and generates 
+	-- a post-conditions violation.
+	protected assertEqual: ? * ? ==> ()
+	assertEqual(expected, actual) == 
+		if expected <> actual then (
+  			IO`print("Actual value (");
+  			IO`print(actual); 
+  			IO`print(") different from expected (");
+  			IO`print(expected);
+  			IO`print(")\n")
+		)
+	post expected = actual;
+
+ -- Test User constructor (Name, gender, age, username and default values not input)
+ public feedConstructorTest: () ==> ()
+ feedConstructorTest() == (
+ return
+ );
+ 
+ -- Add and remove friends only on this user's side (doesn't affect the symmetrical connection on the user he is adding or removing)
+public addRemovePostTest: () ==> ()
+  addRemovePostTest() == (
+  -- Test that user starts out with 0 friends
+	dcl u1:User := facebook.register("testUser1","testEmail1@hotmail.com", "testPassword1");
+	dcl u2:User := facebook.register("testUser2","testEmail2@hotmail.com", "testPassword2");
+	dcl u3:User := facebook.register("testUser3","testEmail3@hotmail.com", "testPassword3");
+	dcl u4:User := facebook.register("testUser4","testEmail4@hotmail.com", "testPassword4");
+ 	dcl date1 : Date := new Date(2019, 02, 12, 20, 32, 00);
+ 	dcl date2 : Date := new Date(2019, 02, 12, 20, 33, 00);
+ 	dcl date3 : Date := new Date(2019, 02, 12, 20, 35, 00);
+	dcl post1:Post := new Post("Post dum friend com privacidade publica", date1, 0);
+	dcl post2:Post := new Post("Post dum friend com privacidade friends", date2, 1);
+	dcl post3:Post := new Post("Primeiro post do 3", date3, 0);
+	dcl post4:Post := new Post("Primeiro post no perfil", date1, 0);
+	dcl post5:Post := new Post("Segundo post no perfil", date2, 0);
+	dcl post6:Post := new Post("Terceiro post no perfil", date3, 0);
+	dcl post7:Post := new Post("Post publico do user 4", date3, 0);
+	dcl post8:Post := new Post("Post dum bestfriend com privaciade friends", date3, 1);
+	dcl post9:Post := new Post("Post dum bestfriend com privacidade bestfriends", date3, 2);
+	
+	
+	
+	assertTrue(card facebook.getUsers() = 4);
+
+ 	assertTrue(u1.getFriends() = {});
+  assertTrue(u1.getPosts() = {});
+  
+  -- u1 adds u2 to his friends set
+  u1.addFriend(u2);
+ 	assertTrue(card u1.getFriends() = 1);
+  assertTrue(forall us in set u1.getFriends() & us.getName() = "testUser2");
+  -- u1 adds u3 to his bestfriends set
+  u1.addFriend(u3);
+  assertTrue(card u1.getFriends() = 2);
+  assertTrue(exists1 us in set u1.getFriends() & us.getName() = "testUser3");
+  u3.addBestFriend(u1);
+  assertTrue(card u3.getBestFriends() = 1);
+  assertTrue(exists1 us in set u3.getBestFriends() & us.getName() = "testUser1");
+
+  
+
+ --u2 add 2 posts and verifies the time each post was done
+ 	assertEqual(u3.addPost(post3), post3);
+ 	assertEqual(u3.addPost(post8), post8);
+ 	assertEqual(u3.addPost(post9), post9);
+
+	assertEqual(u2.addPost(post1), post1);
+	assertEqual(u2.addPost(post2), post2);
+	
+	-- u1 add posts 
+	assertEqual(u1.addPost(post4), post4);
+	assertEqual(u1.addPost(post5), post5);
+	assertEqual(u1.addPost(post6), post6);
+	
+	-- u4 add public post
+	assertEqual(u4.addPost(post7), post7);
+	
+	
+	u1.getFeed().getAllVisiblePostsForMe(facebook,u1);
+	
+	u1.getFeed().getMyPosts(u1);
+  return
+);
+               
+
+public static main: () ==> ()
+	main() ==
+(
+dcl FeedTest: FeedTest :=new FeedTest();
+	FeedTest.feedConstructorTest();
+  FeedTest.addRemovePostTest();
+	return      
+);
+end FeedTest

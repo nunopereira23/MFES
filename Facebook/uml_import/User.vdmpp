@@ -1,0 +1,220 @@
+class User
+types 
+
+/*Falta definir o que se pode fazer em cada estado*/
+	public Status = <LOGGED_IN> | <LOGGED_OUT>;
+	
+instance variables
+
+	status : Status := <LOGGED_OUT>; /*Estado inicial é logged off */ 
+	user_id: seq of nat := []; /*Ver id incremental*/
+  posts:set of (Post) := {};
+  friends:set of (User) := {};
+  name:Utils`String;
+  email:Utils`String;
+  private password:Utils`String;
+  bestFriends: set of User :={};
+  dataBase: Facebook := new Facebook();
+  feed: Feed := new Feed();
+    /*pendentFriendsRequest: set of User;*/
+
+operations
+
+/*Construtor do User */
+  public User: Utils`String * Utils`String * Utils`String * set of Post * set of User ==> User
+  User(newName, newEmail, newPassword, newPosts, newFriends) == (
+  	name := newName;
+  	email := newEmail;
+  	password := newPassword;
+  	posts := newPosts;
+  	friends := newFriends;
+  	status := <LOGGED_IN>;
+  	dataBase.addUserToUsers(self);
+  )
+;
+
+  public  editName : Utils`String ==> ()
+  editName(newName) == (
+  name := newName;
+);
+
+/* Métodos Get*/
+	
+	public pure getStatus: () ==> Status 
+	getStatus() == (
+		return status;
+	);
+	
+	public pure getFeed: () ==> Feed 
+	getFeed() == (
+		return feed;
+	);
+		
+	public pure getEmail: () ==> Utils`String
+	getEmail() == (
+			return email;
+	);
+	
+	public pure getName: () ==> Utils`String
+	getName() == (
+			return name;
+	);
+
+	public pure getUserID: () ==> seq of nat
+	getUserID() == (
+			return user_id;
+	);
+	
+ public pure  getPassword : ()  ==> Utils`String
+   getPassword() == (
+   	return password;
+   );
+	
+	public pure getFriends: () ==> set of User
+	getFriends() == (
+			return friends;
+	);
+	
+	 public pure  getPosts : ()  ==> set of Post
+   getPosts() == (
+   	return posts;
+   );
+   
+   public pure getBestFriends : () ==> set of User
+   getBestFriends() == (
+   	return bestFriends;
+   );
+	
+	/*Métodos Set*/
+
+public setName : Utils`String ==> ()
+setName(newName) == (
+	name := newName;
+);
+
+public setStatus : Status ==> ()
+setStatus(newStatus) == (
+	status := newStatus;
+);
+
+/*Funções*/
+
+--EditPassword - Confirma password antiga e se correta altera e retorna true
+  public  editPassword : Utils`String * Utils`String ==> bool
+  editPassword(oldPassword, newPassword) == (
+    if password = oldPassword
+    then (password := newPassword; return true;)
+    else return false;
+    
+    );
+
+/*
+ --Criar o post e adicioná-lo com a função addPost aos posts do user
+  public  createPost : nat * Utils`String * Utils`String * bool ==> ()
+  createPost(userID, description, date, ifPrivate) == (
+  Post newPost := Post`Post(userID, description, date, ifPrivate);
+   addPost(newPost);
+);
+*/
+
+/*Considera que todos os posts são diferentes
+Para isto comparar pela data (não há dois posts do mesmo user ao mesmo tempo)*/
+  public addPost: Post ==> Post
+  addPost(newPost) == (
+  	posts := {newPost} union posts; 
+  	dataBase.addPostToPosts(newPost);
+  	)
+  	pre not newPost in set posts
+  	post posts = {newPost} union posts;
+  	
+  public removePost: Post ==> bool
+  removePost(selectedPost) == (
+  	posts := posts \ {selectedPost}; 
+  	dataBase.removePostFromPosts(selectedPost);
+  	)
+  	pre selectedPost in set posts
+  	post posts = posts \ {selectedPost};
+  	
+  	
+
+/*
+public sendFriendRequest : Utils`String ==> ()
+sendFriendRequest(friendName) == (
+	
+	);
+*/
+
+	 public  addFriend : User ==> ()
+  addFriend(friend) == (
+  	self.addFriendAux(friend);
+  	friend.addFriendAux(self);
+  );
+
+  public  addFriendAux : User ==> ()
+  addFriendAux(friend) == (
+  	friends := {friend} union friends;
+  );
+ 
+    public removeFriend: User ==> ()
+ 	 removeFriend(selectedFriend) == (
+ 	 self.removeFriendAux(selectedFriend);
+ 	 selectedFriend.removeFriendAux(self);
+  	);
+ 
+ 
+   public removeFriendAux: User ==> ()
+ 	 removeFriendAux(selectedFriend) == (
+  	friends := friends \ {selectedFriend}; 
+  	)
+  	pre selectedFriend in set friends
+  	post friends = friends \ {selectedFriend};
+  	
+  
+--verifica se o user está nos amigos, se sim retorna true 
+  public checkFriend : User ==> bool
+  checkFriend(selectedUser) == (
+  	if selectedUser in set friends
+  	then return true;
+  return false;
+  );
+  
+    public checkBestFriend : User ==> bool
+  checkBestFriend(selectedUser) == (
+  	if selectedUser in set bestFriends
+  	then return true;
+  return false;
+  );
+  
+  --Adiciona amigo aos melhores amigos
+  public addBestFriend : User ==> () 
+  addBestFriend(friend) == (
+  if checkFriend(friend)
+  then (
+  	bestFriends := {friend} union bestFriends;
+  );
+  );
+
+--Remove amigo dos melhores amigos  
+    public removeBestFriend: User ==> ()
+ 	 removeBestFriend(selectedFriend) == (
+  	bestFriends := bestFriends \ {selectedFriend}; 
+  	)
+  	pre selectedFriend in set bestFriends
+  	post bestFriends = bestFriends \ {selectedFriend};
+
+--Formato para print do user
+public printUser : () ==> () 
+printUser() ==(
+	IO`print("\nName: ");
+	IO`print(self.name);
+	IO`print("\n");
+	IO`print("Email: ");
+	IO`print(self.email);
+	IO`print("\n");
+);
+
+-- Quando adicionamos um post podemos selecionar quem vê
+-- se só os best friends, se os amigos, se toda a gente que visitar o perfil
+-- bfs, fs, public
+
+end User

@@ -1,0 +1,127 @@
+class UserTest
+types
+public String = seq of char;
+values
+-- TODO Define values here
+instance variables
+ public user:User := new User("testUser", "testEmail@hotmail.com", "testPassword", {}, {});
+ public facebook:Facebook := new Facebook();
+operations
+
+-- Assert Generic Operation
+ assertTrue: bool ==> ()
+                assertTrue(cond) == return
+                pre cond;
+                
+	protected assertEqual: ? * ? ==> ()
+	assertEqual(expected, actual) == 
+		if expected <> actual then (
+  			IO`print("Actual value (");
+  			IO`print(actual); 
+  			IO`print(") different from expected (");
+  			IO`print(expected);
+  			IO`print(")\n")
+		)
+	post expected = actual;
+
+ -- Test User constructor (Name, gender, age, username and default values not input)
+ public userConstructorTest: () ==> ()
+ userConstructorTest() == (
+ 	dcl testUser:User := new User("testUser","testEmail@hotmail.com", "testPassword", {}, {});
+ 	
+ 	assertTrue(testUser.getName() = "testUser");
+ 	assertTrue(testUser.getEmail() = "testEmail@hotmail.com");
+ 	assertTrue(testUser.getPassword() = "testPassword");
+ 	assertTrue(testUser.getFriends() = {});
+  assertTrue(testUser.getPosts() = {});
+ 	
+ return
+ );
+ 
+ -- Add and remove friends only on this user's side (doesn't affect the symmetrical connection on the user he is adding or removing)
+public addRemoveFriendTest: () ==> ()
+  addRemoveFriendTest() == (
+  -- Test that user starts out with 0 friends
+	dcl u1:User := new User("testUser1","testEmail1@hotmail.com", "testPassword1", {}, {});
+	dcl u2:User := new User("testUser2","testEmail2@hotmail.com", "testPassword2", {}, {});
+	dcl u3:User := new User("testUser3","testEmail3@hotmail.com", "testPassword3", {}, {});
+ 	assertTrue(u1.getFriends() = {});
+  assertTrue(u1.getPosts() = {});
+  
+  -- u1 adds u2 to his friends set
+  u1.addFriend(u2);
+ 	assertTrue(card u1.getFriends() = 1);
+  assertTrue(forall us in set u1.getFriends() & us.getName() = "testUser2");
+  
+ 	assertTrue(card u2.getFriends() = 1);
+  assertTrue(forall us in set u2.getFriends() & us.getName() = "testUser1");
+  -- u1 adds u3 to his friends set
+  u1.addFriend(u3);
+  assertTrue(card u1.getFriends() = 2);
+  assertTrue(exists1 us in set u1.getFriends() & us.getName() = "testUser3");
+  
+  assertTrue(card u3.getFriends() = 1);
+  assertTrue(forall us in set u3.getFriends() & us.getName() = "testUser1");
+  
+  -- u1 removes u2 from his friends set
+  u1.removeFriend(u2);
+  assertTrue(card u1.getFriends() = 1);
+  assertTrue(forall us in set u1.getFriends() & us.getName() = "testUser3");
+  assertTrue(card u2.getFriends() = 0);
+  
+  u1.addBestFriend(u3);
+  assertTrue(card u1.getBestFriends() = 1);
+  assertTrue(forall us in set u1.getBestFriends() & us.getName() = "testUser3");
+  
+  u1.removeBestFriend(u3);
+  assertTrue(card u1.getBestFriends() = 0);
+  
+  -- u1 removes u3 from his friends set
+  u1.removeFriend(u3);
+  assertTrue(card u1.getFriends() = 0);
+  assertTrue(card u3.getFriends() = 0);
+  
+  return
+);
+               
+ -- Edit User Name
+public editName: () ==> ()
+	editName() == (
+	user.editName("ModifiedName");
+	assertTrue(len user.getName() = 12);
+	assertTrue(user.getName() = "ModifiedName");
+	user.editName("");
+	assertTrue(len user.getName() = 0);
+	assertTrue(user.getName() = "");
+	return
+);
+
+ --Login e Logout
+
+public loginLogout: () ==> ()
+	loginLogout() == (
+	
+	dcl u2:User := new User("testUser2","testEmail2@hotmail.com", "testPassword2", {}, {});
+	user.addFriend(u2); 
+	assertTrue(u2.getStatus() = <LOGGED_IN>);
+	assertTrue(facebook.logoff("testEmail2@hotmail.com") = true);
+
+	assertEqual(user.getStatus(), <LOGGED_OUT>);
+	assertTrue(facebook.login("testEmail2@hotmail.com", "testPassword2")=true);
+	assertEqual(user.getStatus(), <LOGGED_IN>);
+	assertTrue(user.checkFriend(u2) = true);
+
+	return 
+);
+
+public static main: () ==> ()
+	main() ==
+(
+dcl UserTest: UserTest :=new UserTest();
+	UserTest.userConstructorTest();
+  UserTest.addRemoveFriendTest();
+  UserTest.editName();
+  --UserTest.loginLogout();
+	return      
+);
+end UserTest

@@ -1,0 +1,75 @@
+class FacebookTest
+
+types
+public String = seq of char;
+values
+-- TODO Define values here
+instance variables
+
+facebook:Facebook := new Facebook();
+
+operations
+
+-- Assert Generic Operation
+ assertTrue: bool ==> ()
+                assertTrue(cond) == return
+                pre cond;
+                
+	protected assertEqual: ? * ? ==> ()
+	assertEqual(expected, actual) == 
+		if expected <> actual then (
+  			IO`print("Actual value (");
+  			IO`print(actual); 
+  			IO`print(") different from expected (");
+  			IO`print(expected);
+  			IO`print(")\n")
+		)
+	post expected = actual;
+
+operations
+
+ public facebookConstructorTest: () ==> ()
+ facebookConstructorTest() == (
+ return
+ );
+ 
+ public registerTest : () ==> () 
+ registerTest() ==(
+ 
+ --Regista 2 utilizadores e falha quando se repete o mail de um utilizador
+ 	if facebook.register("user1", "user1@hotmail.com", "1234") <> nil
+ 	then IO`print("User Adicionado\n");
+  if facebook.register("user2", "user2@hotmail.com", "12345") <> nil
+  then IO`print("User Adicionado\n");
+ 	assertEqual(facebook.register("user1 - Novo", "user1@hotmail.com", "1234"), nil);
+ 	
+ 	-- Verifica o estado por default quando regista um utilizador
+ 	assertEqual(facebook.getUserByEmail("user1@hotmail.com").getStatus(), <LOGGED_IN>);
+ 	assertEqual(facebook.getUserByEmail("user2@hotmail.com").getStatus(), <LOGGED_IN>);
+ 	
+ 	
+ 	
+ );
+ 
+ -- Mostrar todos os utilizadores
+ public showUsersTest : () ==> () 
+ showUsersTest() ==(
+ 
+ 	facebook.printAllUsers(facebook.getUsers());
+ 	
+ );
+ 
+
+public static main: () ==> ()
+	main() ==
+(
+dcl FacebookTest: FacebookTest := new FacebookTest();
+	FacebookTest.facebookConstructorTest();
+  FacebookTest.registerTest();
+  FacebookTest.showUsersTest();
+	return      
+);
+
+traces
+-- TODO Define Combinatorial Test Traces here
+end FacebookTest

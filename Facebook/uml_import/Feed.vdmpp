@@ -1,0 +1,110 @@
+class Feed
+
+instance variables
+
+operations
+
+-- Organizar Posts por data (recebe o user que vai ver esse feed)
+
+public getAllVisiblePostsForMe : Facebook * User ==> ()
+getAllVisiblePostsForMe(facebook, user) ==(
+
+	IO`print("********************* \n");
+	IO`print("******News Feed****** \n");
+	IO`print("********************* \n\n");
+
+self.getAllPublicPosts(facebook);
+self.getAllFriendsPosts(user);
+self.getAllBestFriendsPosts(user);
+);
+
+
+--Get todos os posts publicos
+public getAllPublicPosts : Facebook ==> () 
+getAllPublicPosts(facebook) ==(
+
+	for all user1 in set facebook.getUsers() do
+		
+		for all post1 in set user1.getPosts() do(
+		if post1.getIfPrivate() = 0 
+		then(
+			IO`print(user1.getName());
+			IO`print(" said: ");
+			IO`print("\n");
+			IO`print(post1.getDescription());
+			IO`print("\n");
+			post1.getDate().printDate(post1.getDate());
+			IO`print("\n\n");
+			)
+	);
+);
+
+--Get todos os posts com visibilidade para friends dos quais eu sou friend
+public getAllFriendsPosts : User ==> ()
+getAllFriendsPosts(user) ==(
+	
+	for all user1 in set user.getFriends() do 
+		
+		for all post1 in set user1.getPosts() do(
+		
+		if post1.getIfPrivate() = 1 
+		then(
+			IO`print(user1.getName());
+			IO`print(" said: ");
+			IO`print("\n");
+			IO`print(post1.getDescription());
+			IO`print("\n");
+			post1.getDate().printDate(post1.getDate());
+			IO`print("\n\n");
+			)
+	);
+);
+
+
+--Get todos os posts com visibilidade para best friends dos quais eu sou bestFriend
+public getAllBestFriendsPosts : User ==> ()
+getAllBestFriendsPosts(user) ==(
+
+	for all user1 in set user.getFriends() do(
+
+		for all us in set user1.getBestFriends() do(
+		
+			if us.getEmail()=user.getEmail()
+				then	for all post1 in set user1.getPosts() do(
+				
+					 if post1.getIfPrivate() = 2 
+			
+				then(				
+			IO`print(user1.getName());
+			IO`print(" said: ");
+			IO`print("\n");
+			IO`print(post1.getDescription());
+			IO`print("\n");
+			post1.getDate().printDate(post1.getDate());
+			IO`print("\n\n");
+			)
+		)
+	)
+)
+);
+
+
+public getMyPosts : User ==> ()
+getMyPosts(user) ==(
+	
+	IO`print("********************* \n");
+	IO`print("*****My  Profile***** \n");
+	IO`print("********************* \n\n");
+	
+	for all post1 in set user.getPosts() do(
+	IO`print("You wrote: ");
+	IO`print("\n");
+	IO`print(post1.getDescription());
+	IO`print("\n");
+	post1.getDate().printDate(post1.getDate());
+	IO`print("\n\n");
+);
+
+);
+
+end Feed

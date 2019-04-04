@@ -1,0 +1,114 @@
+class Facebook
+--Main Class
+instance variables
+	users : set of User;
+	posts : set of Post;
+
+operations
+ --Facebook Constructor
+ public Facebook : () ==> Facebook
+ Facebook() ==(
+ 	users := {}; posts := {};
+ )
+ post users = {} and posts = {};
+ 
+ --Get todos os utilizadores
+ 
+ public getUsers : () ==> set of User
+ getUsers() ==(
+ 	return self.users;
+ );
+ 
+ 
+ -- Register
+	public register : Utils`String * Utils`String * Utils`String ==> [User]
+	register(registerName, registerEmail, registerPassword) ==(
+		if getUserByEmail(registerEmail) = nil
+		then (
+		dcl newUser:User := new User(registerName, registerEmail, registerPassword, {}, {});
+		users := users union {newUser} ;
+		return newUser;
+		);
+	IO`print("Ja existe um utilizador registado com esse e-mail!");
+	return nil;
+	);
+ 
+ -- Login
+	public login : Utils`String * Utils`String ==> bool
+	login(loginEmail, loginPassword) ==(
+		if getUserByEmail(loginEmail).getPassword() = loginPassword
+		then (
+		getUserByEmail(loginEmail).setStatus(<LOGGED_IN>);
+		return true;
+		);
+	return false;
+	)
+	pre getUserByEmail(loginEmail).getStatus() = <LOGGED_OUT>
+	post getUserByEmail(loginEmail).getStatus() = <LOGGED_IN>;
+	
+-- Logoff
+	public logoff : Utils`String ==> bool
+	logoff(loginEmail) ==(
+	if getUserByEmail(loginEmail).getStatus() = <LOGGED_IN>
+		then( getUserByEmail(loginEmail).setStatus(<LOGGED_OUT>);
+		return true;)
+		else return false;
+	)
+	pre getUserByEmail(loginEmail).getStatus() = <LOGGED_IN>
+	post getUserByEmail(loginEmail).getStatus() = <LOGGED_OUT>;
+
+-- Retorna um User pelo seu Email
+public pure getUserByEmail : Utils`String ==> [User]
+getUserByEmail(email) == (
+	for all user in set users do
+	if (user.getEmail() = email) 
+	then return user;
+return nil;
+);
+
+--Adicionar um user implica introduzi-lo no set de users
+public addUserToUsers : User==> User
+addUserToUsers(newUser) == (
+  users := {newUser} union users; 
+  return newUser;
+  )
+pre not newUser in set users
+post users = {newUser} union users;
+
+--Remover user do set users
+public removeUserFromUsers : User ==> bool
+removeUserFromUsers(selectedUser) == (
+	users := users \ {selectedUser};
+	return true;
+)
+pre selectedUser in set users
+post users = users \ {selectedUser};
+
+--Adicionar post ao set posts
+public addPostToPosts : Post ==> Post
+addPostToPosts(newPost) == (
+  posts := {newPost} union posts; 
+  return newPost;
+  )
+pre not newPost in set posts
+post posts = {newPost} union posts;
+
+--Remover post do set posts
+public removePostFromPosts : Post ==> bool
+removePostFromPosts(selectedPost) == (
+	posts := posts \ {selectedPost};
+	return true;
+)
+pre selectedPost in set posts
+post posts = posts \ {selectedPost};
+
+-- Mostrar todos os utilizadores registados
+public printAllUsers : set of User ==> ()
+printAllUsers(allUsers) ==(
+	for all user1 in set allUsers do
+	(
+		user1.printUser();
+	);
+);
+
+end Facebook

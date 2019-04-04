@@ -1,0 +1,103 @@
+class Date
+types
+	public CalendarDate ::	year : nat
+													month : nat1
+													day : nat1
+					inv cd == cd.month <= 12 and cd.day <= 31;
+	public TimeStamp ::	hours : nat
+											minutes : nat
+											seconds : nat
+					inv ts == ts.hours <= 23 and ts.minutes <= 59 and ts.seconds <= 59;
+instance variables
+	calendardate : CalendarDate := mk_CalendarDate(2019, 1, 1);
+	timestamp : TimeStamp := mk_TimeStamp(0, 0, 0);
+
+operations
+	public 	Date: () ==> Date
+	Date() ==
+	(
+		calendardate.year := 2019;
+  	calendardate.month := 1;
+  	calendardate.day := 1;
+  	timestamp.hours := 0;
+  	timestamp.minutes := 0;
+  	timestamp.seconds := 0;
+	);
+	
+  public  Date : nat * nat1 * nat1 * nat * nat * nat ==> Date
+  Date(yr, mnth, d, hrs, mnts, scnds) ==
+  (
+  	calendardate.year := yr;
+  	calendardate.month := mnth;
+  	calendardate.day := d;
+  	timestamp.hours := hrs;
+  	timestamp.minutes := mnts;
+  	timestamp.seconds := scnds;
+  );
+  
+  public pure isEqual : [Date] ==> bool
+  isEqual(date) ==
+  (
+  	if	self.calendardate.year = date.calendardate.year and 
+  			self.calendardate.month = date.calendardate.month and
+  			self.calendardate.day = date.calendardate.day and
+  			self.timestamp.hours = date.timestamp.hours and
+  			self.timestamp.minutes = date.timestamp.minutes and
+ 				self.timestamp.seconds = date.timestamp.seconds
+ 		then return true
+ 		else return false; 
+  )
+  pre date <> nil;
+  
+  public pure isOlder : [Date] ==> bool
+  isOlder(date) ==
+  (
+  	if self.calendardate.year < date.calendardate.year
+  	then return true
+  	else if self.calendardate.year > date.calendardate.year
+  	then return false;
+  	
+  	if self.calendardate.month < date.calendardate.month
+  	then return true
+  	else if self.calendardate.month > date.calendardate.month
+  	then return false;
+  	
+  	if self.calendardate.day < date.calendardate.day
+  	then return true
+  	else if self.calendardate.day > date.calendardate.day
+  	then return false;
+  	
+  	if self.timestamp.hours < date.timestamp.hours
+  	then return true
+  	else if self.timestamp.hours > date.timestamp.hours
+  	then return false;
+  	
+  	if self.timestamp.minutes < date.timestamp.minutes
+  	then return true
+  	else if self.timestamp.minutes > date.timestamp.minutes
+  	then return false;
+  	
+  	if self.timestamp.seconds < date.timestamp.seconds
+  	then return true
+  	else if self.timestamp.seconds > date.timestamp.seconds
+  	then return false;
+  	
+  	return false;
+  );
+  
+  public printDate : Date ==> ()
+  printDate(date) == (
+  IO`print("Date: ");
+  IO`print(date.calendardate.day);
+  IO`print("/");
+  IO`print(date.calendardate.month);
+  IO`print("/");
+  IO`print(date.calendardate.year);
+  IO`print(" at ");
+  IO`print(date.timestamp.hours);
+  IO`print(":");
+  IO`print(date.timestamp.minutes);
+  
+  );
+
+end Date
